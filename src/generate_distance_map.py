@@ -6,7 +6,7 @@ import fiona
 import os
 
 # dataframe with trains info
-trains_df = pd.read_csv('../data/trans_df.csv')
+trains_df = pd.read_csv('../data/trains_df.csv')
 
 # has grid location info
 grid_loc_df = pd.read_csv('../data/grid_loc.csv')
@@ -27,3 +27,20 @@ def create_nearest_distance_df():
     grid_loc_df['closest_distance'] = closest_dist
     grid_loc_df['nearest_station'] = nearest_station
     grid_loc_df.to_csv('grid_loc_df_with_dist.csv')
+
+
+def create_shapefile(shapefile, grid_df):
+    with fiona.open(shapefile, 'r') as grids:
+
+        schema = grids.schema.copy()
+        schema['properties']['nearest_station'] = 'int'
+        schema['properties']['nearest_dist'] = 'float'
+
+        with fiona.collection('join-data_grids.shp', 'w', 'ESRI Shapefile', schema) as output:
+            for shapefile_record in grids:
+                gid = shapefile_record['properties']['g250m_id']
+                closest_station = grid_df[gid]['closest_station']
+                nearest_distance = grid_df[gid]['nearest_distance']
+                shapefile_record['properties']['nearest_distance'] = nearest_distance
+                shapefile_record['properties']['closest_station'] = closest_station
+                output.write(shapefile_record)
