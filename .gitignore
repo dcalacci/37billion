@@ -54,3 +54,5 @@ docs/_build/
 
 data/
 .DS_Store
+.ipynb_checkpoints
+*.csv
