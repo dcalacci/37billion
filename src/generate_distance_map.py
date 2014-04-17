@@ -6,10 +6,10 @@ import fiona
 import os
 
 # dataframe with trains info
-trains_df = pd.read_csv('../data/trains_df.csv')
+trains_df = pd.read_csv('../notebooks/trains_df.p')
 
 # has grid location info
-grid_loc_df = pd.read_csv('../data/grid_loc.csv')
+grid_loc_df = pd.read_csv('../notebooks/grid_loc_df.csv')
 
 
 def create_nearest_distance_df():
