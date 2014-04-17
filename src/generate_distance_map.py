@@ -33,14 +33,23 @@ def create_shapefile(shapefile, grid_df):
     with fiona.open(shapefile, 'r') as grids:
 
         schema = grids.schema.copy()
-        schema['properties']['nearest_station'] = 'int'
-        schema['properties']['nearest_dist'] = 'float'
+        properties = schema['properties'].items()
+        properties.append(('closest_distance', 'float'))
+        properties.append(('nearest_station', 'int'))
+        schema['properties'] = dict(properties)
 
         with fiona.collection('join-data_grids.shp', 'w', 'ESRI Shapefile', schema) as output:
+            count = 0
             for shapefile_record in grids:
+                count += 1
+                if count % 1000 == 0:
+                    p = float(count)/len(grids)*100
+                    print "processed", p, "% of records"
+                    
                 gid = shapefile_record['properties']['g250m_id']
-                closest_station = grid_df[gid]['closest_station']
-                nearest_distance = grid_df[gid]['nearest_distance']
-                shapefile_record['properties']['nearest_distance'] = nearest_distance
-                shapefile_record['properties']['closest_station'] = closest_station
+                nearest_station = grid_df.ix[gid]['nearest_station']
+                closest_distance = grid_df.ix[gid]['closest_distance']
+
+                shapefile_record['properties']['closest_distance'] = closest_distance
+                shapefile_record['properties']['nearest_station'] = nearest_station
                 output.write(shapefile_record)
