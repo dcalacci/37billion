@@ -40,8 +40,7 @@ def create_shapefile(shapefile, grid_df):
 
         with fiona.collection('join_data_grids.shp', 'w', 'ESRI Shapefile',
                               schema=schema,
-                              crs=shapefile.crs,
-                              driver=shapefile.driver) as output:
+                              crs=grids.crs) as output:
             count = 0
             for shapefile_record in grids:
                 count += 1
